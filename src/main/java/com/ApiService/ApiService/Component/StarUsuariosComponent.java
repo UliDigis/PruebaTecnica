@@ -1,24 +1,26 @@
 package com.ApiService.ApiService.Component;
 
 import com.ApiService.ApiService.Entity.Usuario;
+import com.ApiService.ApiService.Service.LogicService;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StarUsuariosComponent {
     
-    
-    
-    
+    @Autowired
+    private LogicService logicService;
     
     @PostConstruct
     public void Start(){
         //Usuario 1
         Usuario usuario = new Usuario();
-        usuario.setId(UUID.randomUUID());
+        UUID generador1 = UUID.randomUUID();
+        usuario.setId(generador1.toString());
         usuario.setName("Ulises");
         usuario.setEmail("ulises@gmail.com");
         
@@ -29,7 +31,8 @@ public class StarUsuariosComponent {
         
         //Usuario 2
         Usuario usuario2 = new Usuario();
-        usuario2.setId(UUID.randomUUID());
+        UUID generador2 = UUID.randomUUID();
+        usuario2.setId(generador2.toString());
         usuario2.setName("Mariela");
         usuario2.setEmail("mariela@gmail.com");
         
@@ -40,7 +43,8 @@ public class StarUsuariosComponent {
         
         //Usuario 3
         Usuario usuario3 = new Usuario();
-        usuario3.setId(UUID.randomUUID());
+        UUID generador3 = UUID.randomUUID();
+        usuario3.setId(generador3.toString());
         usuario3.setName("Adrian");
         usuario3.setEmail("adrian@gmail.com");
         
@@ -48,6 +52,11 @@ public class StarUsuariosComponent {
         phone3.add("5763425689");
         phone3.add("5113872012");
         usuario3.setPhone(phone3);
+        
+        logicService.Add(usuario);
+        logicService.Add(usuario2);
+        logicService.Add(usuario3);
+
         
     }
     

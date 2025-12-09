@@ -57,17 +57,18 @@ public class LogicService {
         return result;
     }
 
+    
     public Result Update(Usuario usuario) {
         Result result = new Result();
-
+        
         try {
 
-            if (usuario == null) {
+            if (usuario == null || usuario.getId() == null) {
                 result.correct = false;
                 result.errorMessage = "El usuario viene vacio";
                 result.status = 400;
             } else {
-
+                
                 Usuario usuarioExiste = usuarios.stream()
                         .filter(usuarioF -> usuarioF.getId().equals(usuario.getId()))
                         .findFirst()
@@ -144,7 +145,7 @@ public class LogicService {
         return result;
     }
 
-    public Result Delete(UUID id) {
+    public Result Delete(String id) {
         Result result = new Result();
         
         try{

@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class Usuario {
 
-    private UUID id;
+    private String id;
     
     private String name;
     
@@ -15,11 +15,11 @@ public class Usuario {
     private List<String> phone;
 
     
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
