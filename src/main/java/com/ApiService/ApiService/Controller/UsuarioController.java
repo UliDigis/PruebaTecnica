@@ -15,54 +15,47 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/")
 public class UsuarioController {
 
-    
     @Autowired
     private LogicService logicService;
-    
-    
-    public UsuarioController(LogicService logicService){
+
+    public UsuarioController(LogicService logicService) {
         this.logicService = logicService;
     }
-    
-    
+
     @GetMapping
-    public Result GetAll(){
-        return logicService.GetAll();
+    public Result GetAll(@RequestParam(required = false) String filtroBy) {
+        return logicService.GetAll(filtroBy); 
     }
-    
+
     @PostMapping("add")
-    public Result Add(@RequestBody Usuario usuario){
+    public Result Add(@RequestBody Usuario usuario) {
         UUID generador = UUID.randomUUID();
         usuario.setId(generador.toString());
         return logicService.Add(usuario);
     }
-    
-    
+
     @PutMapping("update/{id}")
-    public Result Update(@PathVariable String id, @RequestBody Usuario usuario){
+    public Result Update(@PathVariable String id, @RequestBody Usuario usuario) {
         usuario.setId(id);
         return logicService.Update(usuario);
     }
-    
+
     @PatchMapping("patch/{id}")
-    public Result Patch(@PathVariable String id, @RequestBody Usuario usuario){
+    public Result Patch(@PathVariable String id, @RequestBody Usuario usuario) {
         usuario.setId(id);
         return logicService.Patch(usuario);
     }
-    
+
     @DeleteMapping("delete/{id}")
-    public Result Delete(@PathVariable String id, @RequestBody Usuario usuario){
-        usuario.setId(id);
+    public Result Delete(@PathVariable String id) {
         return logicService.Delete(id);
     }
-    
-    
-    
-    
+
 }
