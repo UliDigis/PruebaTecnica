@@ -13,67 +13,98 @@ public class LogicService {
     private final List<Usuario> usuarios = new ArrayList<>();
 
     private String Validacion(Usuario usuario) {
+
         if (usuario == null) {
             return "Usuario nulo";
         }
+
         if (usuario.getName() == null || usuario.getName().trim().isEmpty()) {
             return "Name vacío";
         }
+        if (!usuario.getName().matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$")) {
+            return "Name solo debe contener letras";
+        }
+
         if (usuario.getId() == null || usuario.getId().trim().isEmpty()) {
             return "ID vacío";
         }
+
         if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
             return "Email vacío";
         }
+        if (!usuario.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            return "Email inválido";
+        }
+
         if (usuario.getPhone() == null || usuario.getPhone().isEmpty()) {
             return "Phone vacío";
         }
-        boolean vacios = usuario.getPhone().stream().anyMatch(t -> t == null || t.trim().isEmpty());
-        if (vacios) {
-            return "Un teléfono está vacío";
+
+        boolean telefonoInvalido = usuario.getPhone().stream()
+                .anyMatch(telefono -> telefono == null || !telefono.matches("^\\d{10}$"));
+
+        if (telefonoInvalido) {
+            return "Teléfono debe tener 10 dígitos numéricos";
         }
+
         return null;
     }
 
     private String DuplicadoAdd(Usuario usuario) {
-        boolean idDuplicado = usuarios.stream().anyMatch(usuarioExiste -> usuarioExiste.getId().equals(usuario.getId()));
+
+        boolean idDuplicado = usuarios.stream()
+                .anyMatch(usuarioExiste -> usuarioExiste.getId().equals(usuario.getId()));
         if (idDuplicado) {
             return "ID ya existe";
         }
-        boolean emailDuplicado = usuarios.stream().anyMatch(usuarioExiste -> usuarioExiste.getEmail().equalsIgnoreCase(usuario.getEmail()));
+
+        boolean emailDuplicado = usuarios.stream()
+                .anyMatch(usuarioExiste -> usuarioExiste.getEmail().equalsIgnoreCase(usuario.getEmail()));
         if (emailDuplicado) {
             return "Email ya existe";
         }
+
         boolean phoneDuplicado = usuarios.stream()
                 .flatMap(usuarioExiste -> usuarioExiste.getPhone().stream())
-                .anyMatch(t -> usuario.getPhone().contains(t));
+                .anyMatch(telefono -> usuario.getPhone().contains(telefono));
         if (phoneDuplicado) {
             return "Teléfono ya existe";
         }
+
         return null;
     }
 
     private String DuplicadoUpdate(Usuario usuario) {
+
         for (Usuario usuarioUpdate : usuarios) {
+
             if (usuarioUpdate.getId().equals(usuario.getId())) {
                 continue;
             }
+
             if (usuarioUpdate.getEmail().equalsIgnoreCase(usuario.getEmail())) {
                 return "Email ya existe";
             }
-            boolean duplicadoPhone = usuarioUpdate.getPhone().stream().anyMatch(t -> usuario.getPhone().contains(t));
+
+            boolean duplicadoPhone = usuarioUpdate.getPhone().stream()
+                    .anyMatch(telefono -> usuario.getPhone().contains(telefono));
             if (duplicadoPhone) {
                 return "Teléfono ya existe";
             }
         }
+
         return null;
     }
 
     private Usuario UsuarioById(String id) {
-        return usuarios.stream().filter(usuario -> usuario.getId().equals(id)).findFirst().orElse(null);
+        return usuarios.stream()
+                .filter(usuario -> usuario.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     public Result GetAll(String orderBy) {
+
         Result result = new Result();
 
         if (usuarios.isEmpty()) {
@@ -95,27 +126,13 @@ public class LogicService {
 
             List<Usuario> ordenados = usuarios.stream()
                     .sorted((usuario1, usuario2) -> {
-                        if (orden.equals("id")) {
-                            String a = usuario1.getId() == null ? "" : usuario1.getId();
-                            String b = usuario2.getId() == null ? "" : usuario2.getId();
-                            return a.compareTo(b);
-                        }
-                        if (orden.equals("name")) {
-                            String a = usuario1.getName() == null ? "" : usuario1.getName();
-                            String b = usuario2.getName() == null ? "" : usuario2.getName();
-                            return a.compareToIgnoreCase(b);
-                        }
-                        if (orden.equals("email")) {
-                            String a = usuario1.getEmail() == null ? "" : usuario1.getEmail();
-                            String b = usuario2.getEmail() == null ? "" : usuario2.getEmail();
-                            return a.compareToIgnoreCase(b);
-                        }
-                        if (orden.equals("phone")) {
-                            String a = usuario1.getPhone().isEmpty() ? "" : usuario1.getPhone().get(0);
-                            String b = usuario2.getPhone().isEmpty() ? "" : usuario2.getPhone().get(0);
-                            return a.compareTo(b);
-                        }
-                        return 0;
+                        return switch (orden) {
+                            case "id" -> usuario1.getId().compareTo(usuario2.getId());
+                            case "name" -> usuario1.getName().compareToIgnoreCase(usuario2.getName());
+                            case "email" -> usuario1.getEmail().compareToIgnoreCase(usuario2.getEmail());
+                            case "phone" -> usuario1.getPhone().get(0).compareTo(usuario2.getPhone().get(0));
+                            default -> 0;
+                        };
                     })
                     .toList();
 
@@ -133,6 +150,7 @@ public class LogicService {
     }
 
     public Result Add(Usuario usuario) {
+
         Result result = new Result();
         usuario.setId(UUID.randomUUID().toString());
 
@@ -152,21 +170,16 @@ public class LogicService {
             return result;
         }
 
-        try {
-            usuarios.add(usuario);
-            result.correct = true;
-            result.status = 200;
-            result.Object = usuario;
-        } catch (Exception ex) {
-            result.correct = false;
-            result.status = 500;
-            result.errorMessage = "Ocurrió un error: " + ex.getMessage();
-        }
+        usuarios.add(usuario);
+        result.correct = true;
+        result.status = 200;
+        result.Object = usuario;
 
         return result;
     }
 
     public Result Update(Usuario usuario) {
+
         Result result = new Result();
 
         if (usuario == null || usuario.getId() == null) {
@@ -200,25 +213,19 @@ public class LogicService {
             return result;
         }
 
-        try {
-            existe.setName(usuario.getName());
-            existe.setEmail(usuario.getEmail());
-            existe.setPhone(usuario.getPhone());
+        existe.setName(usuario.getName());
+        existe.setEmail(usuario.getEmail());
+        existe.setPhone(usuario.getPhone());
 
-            result.correct = true;
-            result.status = 200;
-            result.Object = existe;
-
-        } catch (Exception ex) {
-            result.correct = false;
-            result.status = 500;
-            result.errorMessage = "Ocurrió un error: " + ex.getMessage();
-        }
+        result.correct = true;
+        result.status = 200;
+        result.Object = existe;
 
         return result;
     }
 
     public Result Patch(Usuario usuario) {
+
         Result result = new Result();
 
         if (usuario == null || usuario.getId() == null) {
@@ -236,39 +243,58 @@ public class LogicService {
             return result;
         }
 
-        try {
-            if (usuario.getEmail() != null && !usuario.getEmail().isBlank()) {
-                existe.setEmail(usuario.getEmail());
-            }
-            if (usuario.getName() != null && !usuario.getName().isBlank()) {
-                existe.setName(usuario.getName());
-            }
-            if (usuario.getPhone() != null && !usuario.getPhone().isEmpty()) {
-                existe.setPhone(usuario.getPhone());
-            }
-
-            String err = DuplicadoUpdate(existe);
-            if (err != null) {
+        if (usuario.getName() != null && !usuario.getName().isBlank()) {
+            if (!usuario.getName().matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$")) {
                 result.correct = false;
                 result.status = 400;
-                result.errorMessage = err;
+                result.errorMessage = "Name solo debe contener letras";
+                return result;
+            }
+            existe.setName(usuario.getName());
+        }
+
+        if (usuario.getEmail() != null && !usuario.getEmail().isBlank()) {
+            if (!usuario.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                result.correct = false;
+                result.status = 400;
+                result.errorMessage = "Email inválido";
+                return result;
+            }
+            existe.setEmail(usuario.getEmail());
+        }
+
+        if (usuario.getPhone() != null && !usuario.getPhone().isEmpty()) {
+
+            boolean telefonoInvalido = usuario.getPhone().stream()
+                    .anyMatch(telefono -> telefono == null || !telefono.matches("^\\d{10}$"));
+
+            if (telefonoInvalido) {
+                result.correct = false;
+                result.status = 400;
+                result.errorMessage = "Teléfono debe tener 10 dígitos numéricos";
                 return result;
             }
 
-            result.correct = true;
-            result.status = 200;
-            result.Object = existe;
-
-        } catch (Exception ex) {
-            result.correct = false;
-            result.status = 500;
-            result.errorMessage = "Ocurrió un error: " + ex.getMessage();
+            existe.setPhone(usuario.getPhone());
         }
+
+        String err = DuplicadoUpdate(existe);
+        if (err != null) {
+            result.correct = false;
+            result.status = 400;
+            result.errorMessage = err;
+            return result;
+        }
+
+        result.correct = true;
+        result.status = 200;
+        result.Object = existe;
 
         return result;
     }
 
     public Result Delete(String id) {
+
         Result result = new Result();
 
         if (id == null) {
@@ -286,16 +312,10 @@ public class LogicService {
             return result;
         }
 
-        try {
-            usuarios.remove(existe);
-            result.correct = true;
-            result.status = 200;
-            result.Object = existe;
-        } catch (Exception ex) {
-            result.correct = false;
-            result.status = 500;
-            result.errorMessage = "Ocurrió un error: " + ex.getMessage();
-        }
+        usuarios.remove(existe);
+        result.correct = true;
+        result.status = 200;
+        result.Object = existe;
 
         return result;
     }

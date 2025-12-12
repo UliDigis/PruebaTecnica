@@ -9,7 +9,7 @@ public class Usuario {
     @Schema(description = "Identificador único del usuario", example = "a3f8e1bc-1234-4bde-9a3b-d4f5b9912c22")
     private String id;
 
-    @Schema(description = "Nombre completo del usuario", example = "Ulises Muñoz")
+    @Schema(description = "Nombre del usuario", example = "Ulises")
     private String name;
 
     @Schema(description = "Correo electrónico del usuario", example = "uliMunoz@example.com")
